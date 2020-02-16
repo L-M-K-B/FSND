@@ -110,6 +110,16 @@ def index():
 def venues():
     # TODO: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
+    data2 = []
+    for place in Venue.query.distinct(Venue.city):
+        city_dict = {"city": place.city, "state": place.state}
+        venues = []
+        for venue in Venue.query.filter(Venue.city == place.city):
+            venue_dict = {"id": venue.id, "name": venue.name}
+            venues.append(venue_dict)
+        city_dict["venues"] = venues
+        data2.append(city_dict)
+
     data = [{
         "city": "San Francisco",
         "state": "CA",
@@ -241,7 +251,7 @@ def show_venue(venue_id):
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
-    form = VenueForm()
+    form = VenueForm()  # see forms.py
     return render_template('forms/new_venue.html', form=form)
 
 

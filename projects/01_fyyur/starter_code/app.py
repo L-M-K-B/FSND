@@ -203,7 +203,7 @@ def show_venue(venue_id):
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
-    form = VenueForm()  # see forms.py
+    form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
 
@@ -299,21 +299,11 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-    form = ArtistForm()
-    artist = {
-        "id": 4,
-        "name": "Guns N Petals",
-        "genres": ["Rock n Roll"],
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "326-123-5000",
-        "website": "https://www.gunsnpetalsband.com",
-        "facebook_link": "https://www.facebook.com/GunsNPetals",
-        "seeking_venue": True,
-        "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-        "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-    }
-    # TODO: populate form with fields from artist with ID <artist_id>
+    # populate form with fields from artist with ID <artist_id>
+    artist = Artist.query.filter_by(id=artist_id).first()
+    form = ArtistForm(obj=artist)
+    form.populate_obj(artist)
+
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
@@ -327,22 +317,10 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    form = VenueForm()
-    venue = {
-        "id": 1,
-        "name": "The Musical Hop",
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    # TODO: populate form with values from venue with ID <venue_id>
+    # populate form with values from venue with ID <venue_id>
+    venue = Venue.query.filter_by(id=venue_id).first()
+    form = VenueForm(obj=venue)
+    form.populate_obj(venue)
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
@@ -381,44 +359,24 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
     # displays list of shows at /shows
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = [{
-        "venue_id": 1,
-        "venue_name": "The Musical Hop",
-        "artist_id": 4,
-        "artist_name": "Guns N Petals",
-        "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-        "start_time": "2019-05-21T21:30:00.000Z"
-    }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "artist_id": 5,
-        "artist_name": "Matt Quevedo",
-        "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-        "start_time": "2019-06-15T23:00:00.000Z"
-    }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-01T20:00:00.000Z"
-    }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-08T20:00:00.000Z"
-    }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "artist_id": 6,
-        "artist_name": "The Wild Sax Band",
-        "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-        "start_time": "2035-04-15T20:00:00.000Z"
-    }]
+    # replace with real venues data.
+    # ==> according to mock data this is not required: num_shows should be aggregated based on number of upcoming shows per venue.
+
+    data = []
+    shows = Show.query.all()
+    for show in Show.query.all():
+        show_dict = {"venue_id": show.venue_id,
+                     "artist_id": show.artist_id, "start_time": show.start_time.isoformat()}
+
+        venue = Venue.query.filter_by(id=show.venue_id).first()
+        show_dict["venue_name"] = venue.name
+
+        artist = Artist.query.filter_by(id=show.artist_id).first()
+        show_dict["artist_name"] = artist.name
+        show_dict["artist_image_link"] = artist.image_link
+
+        data.append(show_dict)
+
     return render_template('pages/shows.html', shows=data)
 
 

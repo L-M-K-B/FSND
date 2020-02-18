@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -219,7 +219,7 @@ def create_venue_submission():
             state=request.form['state'],
             address=request.form['address'],
             phone=request.form['phone'],
-            # TODO: genres=request.form.getlist['genres'],
+            genres=request.form.getlist('genres'),
             website=request.form['website'],
             facebook_link=request.form['facebook_link'],
             image_link=request.form['image_link'],
@@ -230,8 +230,6 @@ def create_venue_submission():
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
     except:
         # on unsuccessful db insert, flash an error instead.
-        # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-        # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         flash('An error occurred. Venue' +
               request.form['name']+'could not be listed.')
         db.session.rollback()
@@ -244,8 +242,17 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
+    # Complete this endpoint for taking a venue_id, and using
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    try:
+        venue = Venue.query.get(venue_id)
+        db.session.delete(venue)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({'success': True})
 
     # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
     # clicking that button delete it from the db then redirect the user to the homepage
@@ -373,7 +380,7 @@ def create_artist_submission():
             city=request.form['city'],
             state=request.form['state'],
             phone=request.form['phone'],
-            # TODO: genres=request.form.getlist['genres'],
+            genres=request.form.getlist('genres'),
             website=request.form['website'],
             facebook_link=request.form['facebook_link'],
             image_link=request.form['image_link']
@@ -384,8 +391,6 @@ def create_artist_submission():
         flash('Artist ' + request.form['name'] + ' was successfully listed!')
     except:
         # on unsuccessful db insert, flash an error instead.
-        # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-        # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         flash('An error occurred. Artist' +
               request.form['name']+'could not be listed.')
         db.session.rollback()
@@ -446,7 +451,6 @@ def create_show_submission():
         flash('Show was successfully listed!')
     except:
         # on unsuccessful db insert, flash an error instead.
-        # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         flash('An error occurred. Show could not be listed.')
         db.session.rollback()
         print(sys.exc_info())

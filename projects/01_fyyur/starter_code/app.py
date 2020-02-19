@@ -47,6 +47,7 @@ class Venue(db.Model):
     website = db.Column(db.String(500))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(1000))
+    shows = db.relationship('Show', backref='Venue')
 
 
 class Artist(db.Model):
@@ -64,6 +65,7 @@ class Artist(db.Model):
     website = db.Column(db.String(500))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(1000))
+    shows = db.relationship('Show', backref='Artist')
 
 # Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 # --my comment-- Artist already exists
@@ -183,25 +185,16 @@ def show_venue(venue_id):
     past_shows = []
     upcoming_shows = []
     for show in shows:
+        show_dict = {
+            "artist_id": show.Artist.id,
+            "artist_name": show.Artist.name,
+            "artist_image_link": show.Artist.image_link,
+            "start_time": show.start_time.isoformat()
+        }
         if datetime.now() > show.start_time:
-            artist = Artist.query.filter_by(id=show.artist_id).first()
-            pastShow_dict = {
-                "artist_id": show.artist_id,
-                "artist_name": artist.name,
-                "artist_image_link": artist.image_link,
-                "start_time": show.start_time.isoformat()
-            }
-            past_shows.append(pastShow_dict)
-
+            past_shows.append(show_dict)
         else:
-            artist = Artist.query.filter_by(id=show.artist_id).first()
-            upcomingShow_dict = {
-                "artist_id": show.artist_id,
-                "artist_name": artist.name,
-                "artist_image_link": artist.image_link,
-                "start_time": show.start_time.isoformat()
-            }
-            upcoming_shows.append(upcomingShow_dict)
+            upcoming_shows.append(show_dict)
 
     data["past_shows"] = past_shows
     data["upcoming_shows"] = upcoming_shows
@@ -321,25 +314,17 @@ def show_artist(artist_id):
     past_shows = []
     upcoming_shows = []
     for show in shows:
+        show_dict = {
+            "venue_id": show.Venue.id,
+            "venue_name": show.Venue.name,
+            "venue_image_link": show.Venue.image_link,
+            "start_time": show.start_time.isoformat()
+        }
         if datetime.now() > show.start_time:
-            venue = Venue.query.filter_by(id=show.venue_id).first()
-            pastShow_dict = {
-                "venue_id": show.venue_id,
-                "venue_name": venue.name,
-                "venue_image_link": venue.image_link,
-                "start_time": show.start_time.isoformat()
-            }
-            past_shows.append(pastShow_dict)
+            past_shows.append(show_dict)
 
         else:
-            venue = Venue.query.filter_by(id=show.venue_id).first()
-            upcomingShow_dict = {
-                "venue_id": show.venue_id,
-                "venue_name": venue.name,
-                "venue_image_link": venue.image_link,
-                "start_time": show.start_time.isoformat()
-            }
-            upcoming_shows.append(upcomingShow_dict)
+            upcoming_shows.append(show_dict)
 
     data["past_shows"] = past_shows
     data["upcoming_shows"] = upcoming_shows

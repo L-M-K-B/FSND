@@ -147,17 +147,29 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-    # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+    # implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for Hop should return "The Musical Hop".
     # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+    search_term = request.form['search_term']
+    suggestions = Venue.query.filter(
+        Venue.name.ilike(f'%{search_term}%')).all()
     response = {
-        "count": 1,
-        "data": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
+        "count": len(suggestions)
     }
+    data = []
+    for suggestion in suggestions:
+        venue_dict = {
+            "id": suggestion.id,
+            "name": suggestion.name,
+        }
+        shows = Show.query.filter(Show.venue_id == suggestion.id).all()
+        venue_dict["num_upcoming_shows"] = len(
+            ["placeholder" for show in shows if datetime.now() < show.start_time])
+
+        data.append(venue_dict)
+
+    response["data"] = data
+
     return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 
@@ -273,17 +285,29 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-    # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+    # implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
     # search for "band" should return "The Wild Sax Band".
+    search_term = request.form['search_term']
+    suggestions = Artist.query.filter(
+        Artist.name.ilike(f'%{search_term}%')).all()
     response = {
-        "count": 1,
-        "data": [{
-            "id": 4,
-            "name": "Guns N Petals",
-            "num_upcoming_shows": 0,
-        }]
+        "count": len(suggestions)
     }
+    data = []
+    for suggestion in suggestions:
+        artist_dict = {
+            "id": suggestion.id,
+            "name": suggestion.name,
+        }
+        shows = Show.query.filter(Show.artist_id == suggestion.id).all()
+        artist_dict["num_upcoming_shows"] = len(
+            ["placeholder" for show in shows if datetime.now() < show.start_time])
+
+        data.append(artist_dict)
+
+    response["data"] = data
+
     return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 

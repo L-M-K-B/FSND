@@ -338,8 +338,24 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-    # TODO: take values from the form submitted, and update existing
+    # take values from the form submitted, and update existing
     # artist record with ID <artist_id> using the new attributes
+    artist = Artist.query.filter_by(id=artist_id).first()
+    try:
+        artist.name = request.form['name'],
+        artist.city = request.form['city'],
+        artist.state = request.form['state'],
+        artist.phone = request.form['phone'],
+        artist.genres = request.form.getlist('genres'),
+        artist.website = request.form['website'],
+        artist.facebook_link = request.form['facebook_link'],
+        artist.image_link = request.form['image_link']
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
     return redirect(url_for('show_artist', artist_id=artist_id))
 
@@ -355,8 +371,26 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
+    # take values from the form submitted, and update existing
     # venue record with ID <venue_id> using the new attributes
+    venue = Venue.query.filter_by(id=venue_id).first()
+    try:
+        venue.name = request.form['name'],
+        venue.address = request.form['address'],
+        venue.city = request.form['city'],
+        venue.state = request.form['state'],
+        venue.phone = request.form['phone'],
+        venue.genres = request.form.getlist('genres'),
+        venue.website = request.form['website'],
+        venue.facebook_link = request.form['facebook_link'],
+        venue.image_link = request.form['image_link']
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist

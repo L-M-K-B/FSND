@@ -6,9 +6,9 @@ import random
 
 from models import setup_db, Question, Category
 
-# ##--------------------------------------------------##
-# ##------------------- pagination -------------------##
-# ##--------------------------------------------------##
+# ##--------------------------------------------------## #
+# ##--------------------- helpers --------------------## #
+# ##--------------------------------------------------## #
 
 QUESTIONS_PER_PAGE = 10
 
@@ -24,8 +24,19 @@ def paginate_questions(selection):
 
     return current_questions
 
+# ##--------------------------------------------------## #
 
-# ##--------------------------------------------------##
+def create_categories_dict(query_res):
+    categories_dict = {}
+
+    for category in query_res:
+        categories_dict[category.id] = category.type
+
+    return categories_dict
+
+# ##--------------------------------------------------## #
+# ##--------------------------------------------------## #
+# ##--------------------------------------------------## #
 
 def create_app(test_config=None):
     # create and configure the app
@@ -43,9 +54,7 @@ def create_app(test_config=None):
                              'GET, POST, PATCH, DELETE, OPTIONS  ')
         return response
 
-    # @TODO:
-    # Create an endpoint to handle GET requests
-    # for all available categories.
+    # Create an endpoint to handle GET requests for all available categories.
     @app.route('/categories', methods=['GET'])
     def get_categories():
         categories = Category.query.all()
@@ -53,15 +62,13 @@ def create_app(test_config=None):
         if len(categories) == 0:
             abort(404)
 
-        categories = {}
-
+        categories_dict = create_categories_dict(categories)
 
         return jsonify({
             'success': True,
-            'categories': True
+            'categories': categories_dict
         })
 
-    # @TODO:
     # Create an endpoint to handle GET requests for questions,
     # including pagination (every 10 questions).
     # This endpoint should return a list of questions,
@@ -71,6 +78,27 @@ def create_app(test_config=None):
     # you should see questions and categories generated,
     # ten questions per page and pagination at the bottom of the screen for three pages.
     # Clicking on the page numbers should update the questions.
+    @app.route('/questions', methods=['GET'])
+    def get_questions():
+        questions = Question.query.all()
+        categories = Category.query.all()
+
+        if len(questions) == 0:
+            abort(404)
+        elif len(categories) == 0:
+            abort(404)
+
+        pagination = paginate_questions(questions)
+
+        categories_dict = create_categories_dict(categories)
+
+        return jsonify({
+            'success': True,
+            'questions': pagination,
+            'total_questions': len(questions),
+            'current_category': 5, # TODO: add functionality
+            'categories': categories_dict
+        })
 
     # @TODO:
     # Create an endpoint to DELETE question using a question ID.
@@ -113,8 +141,7 @@ def create_app(test_config=None):
     # one question at a time is displayed, the user is allowed to answer
     # and shown whether they were correct or not.
 
-    # Create error handlers for all expected errors
-    # including 404 and 422.
+    # Create error handlers for all expected errors including 404 and 422.
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({
@@ -146,5 +173,13 @@ def create_app(test_config=None):
             "error": 422,
             "message": "unprocessable"
         }), 422
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "internal server error"
+        }), 500
 
     return app

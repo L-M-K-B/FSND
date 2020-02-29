@@ -29,10 +29,10 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
+
+    # TODO
+    # Write at least one test for each test for successful operation and for expected errors.
+
 
 
 # Make the tests conveniently executable

@@ -1,0 +1,10 @@
+INSERT INTO questions(question, answer, category, difficulty)
+    VALUES
+        ('BlaBlaBla1', 'BlubbBlubb1', 1, 1),
+        ('BlaBlaBla2', 'BlubbBlubb2', 2, 2),
+        ('BlaBlaBla3', 'BlubbBlubb3', 3, 3),
+        ('BlaBlaBla4', 'BlubbBlubb4', 4, 4),
+        ('BlaBlaBla5', 'BlubbBlubb5', 5, 5),
+        ('BlaBlaBla6', 'BlubbBlubb6', 6, 6);
+
+

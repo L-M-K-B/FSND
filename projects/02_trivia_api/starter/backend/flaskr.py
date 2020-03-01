@@ -83,15 +83,12 @@ def create_app(test_config=None):
         elif len(categories) == 0:
             abort(404)
 
-        pagination = paginate_questions(questions)
-
         categories_dict = create_categories_dict(categories)
 
         return jsonify({
             'success': True,
-            'questions': pagination,
+            'questions': paginate_questions(questions),
             'total_questions': len(questions),
-            'current_category': 5,  # TODO: add functionality
             'categories': categories_dict
         })
 
@@ -134,22 +131,45 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-
-    # @TODO:
     # Create a POST endpoint to get questions based on a search term.
     # It should return any questions for whom the search term
     # is a substring of the question.
-    #
-    # TEST: Search by any phrase. The questions list will update to include
-    # only question that include that string within their question.
-    # Try using the word "title" to start.
+    @app.route('/questions/search', methods=['POST'])
+    def search_question():
+        search_term = request.get_json()['searchTerm']
 
-    # @TODO:
+        try:
+            suggestions = Question.query.filter(
+                Question.question.ilike(f'%{search_term}%')).all()
+
+            if not suggestions:
+                abort(404)
+
+            return jsonify({
+                'success': True,
+                'questions': paginate_questions(suggestions),
+                'total_questions': len(suggestions)
+            })
+        except:
+            abort(422)
+
     # Create a GET endpoint to get questions based on category.
-    #
-    # TEST: In the "List" tab / main screen, clicking on one of the
-    # categories in the left column will cause only questions of that
-    # category to be shown.
+    @app.route('/category/<int:category_id>/questions', methods=['GET'])
+    def get_questions_by_category(category_id):
+        try:
+            questions = Question.query.filter(Question.category == category_id).all()
+
+            if not questions:
+                abort(404)
+
+            return jsonify({
+                'success': True,
+                'questions': paginate_questions(questions),
+                'total_questions': len(questions)
+            })
+        except:
+            abort(422)
+
 
     # @TODO:
     # Create a POST endpoint to get questions to play the quiz.

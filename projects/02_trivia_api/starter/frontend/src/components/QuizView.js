@@ -35,8 +35,8 @@ class QuizView extends Component {
     })
   }
 
-  selectCategory = ({type, id=0}) => {
-    this.setState({quizCategory: {type, id}}, this.getNextQuestion)
+  selectCategory = ( id=0) => {
+    this.setState({quizCategory: id}, this.getNextQuestion)
   }
 
   handleChange = (event) => {
@@ -45,10 +45,12 @@ class QuizView extends Component {
 
   getNextQuestion = () => {
     const previousQuestions = [...this.state.previousQuestions]
-    if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
+    if(this.state.currentQuestion.id) {
+      previousQuestions.push(this.state.currentQuestion.id)
+    }
 
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: '/quizzes',
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -111,7 +113,7 @@ class QuizView extends Component {
                       key={id}
                       value={id}
                       className="play-category"
-                      onClick={() => this.selectCategory({type:this.state.categories[id], id})}>
+                      onClick={() => this.selectCategory(id)}>
                       {this.state.categories[id]}
                     </div>
                   )
@@ -150,6 +152,7 @@ class QuizView extends Component {
   }
 
   renderPlay(){
+    console.log('currentQuestion', this.state.currentQuestion)
     return this.state.previousQuestions.length === questionsPerPlay || this.state.forceEnd
       ? this.renderFinalScore()
       : this.state.showAnswer 

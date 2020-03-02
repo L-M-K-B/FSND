@@ -37,6 +37,15 @@ def create_categories_dict(query_res):
 
 
 # ##--------------------------------------------------## #
+
+def row2dict(row):
+    d = {}
+    for column in row.__table__.columns:
+        d[column.name] = getattr(row, column.name)
+    return d
+
+
+# ##--------------------------------------------------## #
 # ##--------------------------------------------------## #
 # ##--------------------------------------------------## #
 
@@ -170,16 +179,35 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-
-    # @TODO:
     # Create a POST endpoint to get questions to play the quiz.
     # This endpoint should take category and previous question parameters
     # and return a random questions within the given category,
     # if provided, and that is not one of the previous questions.
-    #
-    # TEST: In the "Play" tab, after a user selects "All" or a category,
-    # one question at a time is displayed, the user is allowed to answer
-    # and shown whether they were correct or not.
+    @app.route('/quizzes', methods=['POST'])
+    def search_book_title():
+        previous_questions = request.get_json()['previous_questions']
+        quiz_category = int(request.get_json()['quiz_category'])
+
+        try:
+            if quiz_category:
+                suggestions = Question.query \
+                    .filter(Question.category == quiz_category) \
+                    .filter(Question.id.notin_(previous_questions)) \
+                    .all()
+            else:
+                suggestions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+
+            if not suggestions:
+                new_question = None
+            else:
+                new_question = row2dict(random.choice(suggestions))
+
+            return jsonify({
+                'success': True,
+                'question': new_question,
+            })
+        except:
+            abort(422)
 
     # Create error handlers for all expected errors including 404 and 422.
     @app.errorhandler(400)

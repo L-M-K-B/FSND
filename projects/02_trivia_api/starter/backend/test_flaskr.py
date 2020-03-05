@@ -69,12 +69,13 @@ class TriviaTestCase(unittest.TestCase):
     # '/question/<int:question_id>', methods=['DELETE']
 
     def test_delete_question(self):
-        res = self.client().delete('/question/26')
+        new_id = self.client().post('/question', json=self.new_question).json['created']
+        res = self.client().delete(f'/question/{new_id}')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 26)
+        self.assertEqual(data['deleted'], new_id)
 
     def test_422_question_does_not_exist(self):
         res = self.client().delete('/question/1500')
@@ -145,15 +146,15 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['questions'])
+        self.assertTrue(data['question'])
 
-    def test_422_invalid_category(self):
+    def test_200_invalid_category(self):
         res = self.client().post('/quizzes', json={'previous_questions': [], 'quiz_category': '100'})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'unprocessable')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertIsNone(data['question'])
 
 
 # Make the tests conveniently executable

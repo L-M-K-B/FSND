@@ -1,8 +1,8 @@
-import os
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+
+from sqlalchemy.exc import SQLAlchemyError
 
 from models import setup_db, Question, Category
 
@@ -116,7 +116,7 @@ def create_app(test_config=None):
                 'success': True,
                 'deleted': question_id,
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     # Create an endpoint to POST a new question,
@@ -137,7 +137,7 @@ def create_app(test_config=None):
                 'success': True,
                 'created': new_question.id
             })
-        except:
+        except SQLAlchemyError:
             abort(405)
 
     # Create a POST endpoint to get questions based on a search term.
@@ -159,7 +159,7 @@ def create_app(test_config=None):
                 'questions': paginate_questions(suggestions),
                 'total_questions': len(suggestions)
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     # Create a GET endpoint to get questions based on category.
@@ -176,7 +176,7 @@ def create_app(test_config=None):
                 'questions': paginate_questions(questions),
                 'total_questions': len(questions)
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     # Create a POST endpoint to get questions to play the quiz.
@@ -206,7 +206,7 @@ def create_app(test_config=None):
                 'success': True,
                 'question': new_question,
             })
-        except:
+        except SQLAlchemyError:
             abort(422)
 
     # Create error handlers for all expected errors including 404 and 422.

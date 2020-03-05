@@ -98,3 +98,147 @@ createdb trivia_test
 psql trivia_test < trivia.psql
 python test_flaskr.py
 ```
+# API Endpoints
+## GET: /categories
+- fetches a dictionary of categories:
+    - keys: ids of categories
+    - values: string, name of category
+- request arguments: None
+- returns a json file:
+```
+{
+'success': True,
+'categories':   {'1' : "Science",
+                '2' : "Art",
+                '3' : "Geography",
+                '4' : "History",
+                '5' : "Entertainment",
+                '6' : "Sports"}
+}
+```
+## GET: /questions
+- fetches a list of objects containing all questions
+- each question is formatted as a dictionary containing the following keys: 
+    - id (int)
+    - question (str)
+    - answer (str)
+    - category (int)
+    - difficulty (int)
+- result gets paginated (10 questions per page)
+- fetches a dictionary of categories:
+    - keys: ids of categories
+    - values: string, name of category
+- request arguments: None
+- returns a json file:
+```
+{
+'success': True,
+'questions':    [{'id': 5, 
+                'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", 
+                'answer': 'Maya Angelou', 
+                'category': 4, 
+                'difficulty': 2}, 
+                {'id': 9, 
+                'question': etc. }],
+'total_questions': <length of list (int)>,
+'categories':   {'1' : "Science",
+                '2' : "Art",
+                '3' : "Geography",
+                '4' : "History",
+                '5' : "Entertainment",
+                '6' : "Sports"}
+}
+```
+## DELETE: /question/<question_id>
+- deletes a single question
+- request arguments: 
+    - id of question
+- returns a json file:
+```
+{
+'success': True,
+'deleted': <question_id (int)>
+}
+```
+## POST: /question
+- creates a new question
+- request arguments: 
+    - question (str)
+    - answer (str)
+    - category (int)
+    - difficulty (int)
+- returns a json file:
+```
+{
+'success': True,
+'created': <id of new question (int)>
+}
+```
+## POST: /questions/search
+- fetches a list of objects of questions that contain the search term
+- each question is formatted as a dictionary containing the following keys: 
+    - id (int)
+    - question (str)
+    - answer (str)
+    - category (int)
+    - difficulty (int)
+- result gets paginated (10 questions per page)
+- request arguments:
+    - search term (str)
+- returns a json file:
+```
+{
+'success': True,
+'questions':    [{'id': 5, 
+                'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", 
+                'answer': 'Maya Angelou', 
+                'category': 4, 
+                'difficulty': 2}, 
+                {'id': 9, 
+                'question': etc. }],
+'total_questions': <length of list (int)>
+}
+```
+## GET: /category/<category_id>/questions
+- fetches a list of objects containing all questions of a category
+- each question is formatted as a dictionary containing the following keys: 
+    - id (int)
+    - question (str)
+    - answer (str)
+    - category (int)
+    - difficulty (int)
+- result gets paginated (10 questions per page)
+- request arguments: 
+    - id of category
+- returns a json file:
+```
+{
+'success': True,
+'questions':    [{'id': 5, 
+                'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", 
+                'answer': 'Maya Angelou', 
+                'category': 4, 
+                'difficulty': 2}, 
+                {'id': 9, 
+                'question': etc. }],
+'total_questions': <length of list (int)>
+}
+```
+## POST: /quizzes
+- fetches a list of ids of previous questions
+- fetches the current quiz category
+- request arguments: 
+    - id of question
+- in case no category is chosen &rarr; all available questions will be used for the quiz
+- one play lasts as long as there is a question left that was not yet used in this round
+- returns a json file:
+```
+{
+'success': True,
+'question':    {'id': 5, 
+                'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", 
+                'answer': 'Maya Angelou', 
+                'category': 4, 
+                'difficulty': 2}
+}
+```

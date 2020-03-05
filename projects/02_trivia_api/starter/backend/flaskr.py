@@ -108,7 +108,7 @@ def create_app(test_config=None):
             question = Question.query.filter(Question.id == question_id).one_or_none()
 
             if not question:
-                abort(404)
+                abort(422)
 
             question.delete()
 
@@ -123,7 +123,7 @@ def create_app(test_config=None):
     # which will require the question and answer text,
     # category, and difficulty score.
     @app.route('/question', methods=['POST'])
-    def create_book():
+    def create_question():
         question = request.get_json()['question']
         answer = request.get_json()['answer']
         difficulty = request.get_json()['difficulty']
@@ -138,7 +138,7 @@ def create_app(test_config=None):
                 'created': new_question.id
             })
         except:
-            abort(422)
+            abort(405)
 
     # Create a POST endpoint to get questions based on a search term.
     # It should return any questions for whom the search term
@@ -184,7 +184,7 @@ def create_app(test_config=None):
     # and return a random questions within the given category,
     # if provided, and that is not one of the previous questions.
     @app.route('/quizzes', methods=['POST'])
-    def search_book_title():
+    def play_quiz():
         previous_questions = request.get_json()['previous_questions']
         quiz_category = int(request.get_json()['quiz_category'])
 
@@ -210,14 +210,6 @@ def create_app(test_config=None):
             abort(422)
 
     # Create error handlers for all expected errors including 404 and 422.
-    @app.errorhandler(400)
-    def bad_request(error):
-        return jsonify({
-            "success": False,
-            "error": 400,
-            "message": "bad request"
-        }), 400
-
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({

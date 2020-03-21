@@ -139,8 +139,8 @@ def headers(payload):
     print(payload)
     return 'Access Granted'
 
-@app.route('/image')
-@requires_auth('get:image')
-def images(jwt):
-    print(payload)
-    return 'Access Granted'
+# @app.route('/image')
+# @requires_auth('get:image')
+# def images(jwt):
+#     print(payload)
+#     return 'Access Granted'

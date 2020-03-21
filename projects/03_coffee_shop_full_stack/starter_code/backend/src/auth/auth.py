@@ -141,7 +141,8 @@ def requires_auth(permission=''):
             try:
                 # decode the jwt
                 payload = verify_decode_jwt(token)
-            except:
+            except AuthError as error:
+                print(error)
                 abort(401)
 
             # validate claims and check the requested permission

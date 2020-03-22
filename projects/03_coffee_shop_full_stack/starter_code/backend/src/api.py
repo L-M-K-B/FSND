@@ -22,9 +22,6 @@ db_drop_and_create_all()
 
 
 # ##----------------- get all drinks -----------------## #
-# TODO: implement endpoint => check in postman
-
-
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
     drinks_query = Drink.query.all()
@@ -43,11 +40,10 @@ def get_drinks():
 
 
 # ##----------- get all drinks in details ------------## #
-# TODO implement endpoint => check in postman
-
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth('get:drinks-detail')
-def get_drink_details(payload):
+# TODO: @requires_auth('get:drinks-detail')
+# payload
+def get_drink_details():
     drinks_query = Drink.query.all()
 
     drinks = []
@@ -64,11 +60,10 @@ def get_drink_details(payload):
 
 
 # ##------------------ create drink ------------------## #
-# TODO implement endpoint => check in postman
-
 @app.route('/drinks', methods=['POST'])
-@requires_auth('post:drinks')
-def create_drink(payload):
+# TODO: @requires_auth('post:drinks')
+# payload
+def create_drink():
     title = request.get_json()['title']
     recipe = request.get_json()['recipe']
 
@@ -76,10 +71,11 @@ def create_drink(payload):
         abort(404)
 
     try:
-        new_drink = Drink(title=title, recipe= recipe)
+        new_drink = Drink(title=title, recipe=json.dumps(recipe))
         new_drink.insert()
 
-    except SQLAlchemyError:
+    except SQLAlchemyError as error:
+        print(error)
         abort(422)
 
     return jsonify({
@@ -89,11 +85,10 @@ def create_drink(payload):
 
 
 # ##------------------ update drink ------------------## #
-# TODO implement endpoint => check in postman
-
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-@requires_auth('patch:drinks')
-def update_drink(payload, drink_id):
+# TODO: @requires_auth('patch:drinks')
+# payload,
+def update_drink(drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
     if not drink:
@@ -110,7 +105,7 @@ def update_drink(payload, drink_id):
         drink.title = title
 
     if recipe:
-        drink.recipe = recipe
+        drink.recipe = json.dumps(recipe)
 
     try:
         drink.update()
@@ -125,11 +120,10 @@ def update_drink(payload, drink_id):
 
 
 # ##------------------ delete drink ------------------## #
-# TODO implement endpoint => check in postman
-
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-@requires_auth('delete:drinks')
-def delete_drink(payload, drink_id):
+# TODO: @requires_auth('delete:drinks')
+# payload,
+def delete_drink(drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
     if not drink:
@@ -169,11 +163,11 @@ def not_found(error):
     }), 404
 
 
-# TODO implement error handler for AuthError
-@app.errorhandler(401)
-def unauthorised(error):
+# error handler for AuthError
+@app.errorhandler(AuthError)
+def authentication_error(error):
     return jsonify({
         "success": False,
-        "error": 401,
-        "message": "unauthorised"
-    }), 401
+        "error": error.status_code,
+        "message": "authentication error"
+    }), error.status_code

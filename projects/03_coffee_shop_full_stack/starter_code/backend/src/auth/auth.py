@@ -53,8 +53,6 @@ def get_token_auth_header():
     return token
 
 
-# TODO: check your RBAC settings in Auth0
-
 def check_permissions(permission, payload):
     # raise an AuthError if permissions are not included in the payload
     if 'permissions' not in payload:

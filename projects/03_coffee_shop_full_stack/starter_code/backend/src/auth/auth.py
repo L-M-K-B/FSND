@@ -4,9 +4,9 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-AUTH0_DOMAIN = 'coffee-shop-lb.auth0.com'
+AUTH0_DOMAIN = 'coffee-shop-lb.eu.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = 'coffee'
 
 
 # AuthError Exception: standardized way to communicate auth failure modes
@@ -62,8 +62,8 @@ def check_permissions(permission, payload):
 
     # raise an AuthError if the requested permission string is not in the
     # payload permissions array
-    if permission not in payload['permission']:
-        abort(403)
+    if permission not in payload['permissions']:
+        abort(401)
 
     # return true otherwise
     return True

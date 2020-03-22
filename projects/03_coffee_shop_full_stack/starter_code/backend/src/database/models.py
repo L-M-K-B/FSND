@@ -23,10 +23,14 @@ def setup_db(app):
 # !!NOTE you can change the database_filename variable to have multiple verisons of a database
 def db_drop_and_create_all():
     # drops the database tables and starts fresh
-    # db.drop_all()
+    db.drop_all()
 
     # can be used to initialize a clean database
     db.create_all()
+
+    # creates first entry for postman testing
+    new_drink = Drink(title="Test", recipe='[{"name": "test", "color": "pink", "parts": 100}]')
+    new_drink.insert()
 
 
 # a persistent drink entity, extends the base SQLAlchemy Model

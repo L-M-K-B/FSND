@@ -12,7 +12,6 @@ setup_db(app)
 CORS(app)
 
 # NOTE: THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-# => DROP disabled
 db_drop_and_create_all()
 
 
@@ -41,9 +40,8 @@ def get_drinks():
 
 # ##----------- get all drinks in details ------------## #
 @app.route('/drinks-detail', methods=['GET'])
-# TODO: @requires_auth('get:drinks-detail')
-# payload
-def get_drink_details():
+@requires_auth('get:drinks-detail')
+def get_drink_details(payload):
     drinks_query = Drink.query.all()
 
     drinks = []
@@ -61,9 +59,8 @@ def get_drink_details():
 
 # ##------------------ create drink ------------------## #
 @app.route('/drinks', methods=['POST'])
-# TODO: @requires_auth('post:drinks')
-# payload
-def create_drink():
+@requires_auth('post:drinks')
+def create_drink(payload):
     title = request.get_json()['title']
     recipe = request.get_json()['recipe']
 
@@ -86,9 +83,8 @@ def create_drink():
 
 # ##------------------ update drink ------------------## #
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-# TODO: @requires_auth('patch:drinks')
-# payload,
-def update_drink(drink_id):
+@requires_auth('patch:drinks')
+def update_drink(payload, drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
     if not drink:
@@ -121,9 +117,8 @@ def update_drink(drink_id):
 
 # ##------------------ delete drink ------------------## #
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-# TODO: @requires_auth('delete:drinks')
-# payload,
-def delete_drink(drink_id):
+@requires_auth('delete:drinks')
+def delete_drink(payload, drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
     if not drink:
